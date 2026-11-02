@@ -622,7 +622,8 @@ function cleanSearch(s) {
 
 async function listSkus(env, token, search) {
   const esc = search.replace(/"/g, '\\"');
-  const q = search.includes('/') ? `sku:"${esc}"` : `sku:${esc}* OR product_title:*${esc}*`;
+  // الباركود كمان (بلجن Retail Force Barcode ممكن يولّد باركودات فيها حروف بنمط Advanced) — بحث نصي بيلاقيه بالباركود مش بس SKU والاسم
+  const q = search.includes('/') ? `sku:"${esc}"` : `sku:${esc}* OR product_title:*${esc}* OR barcode:${esc}*`;
   const gql = `
     query ListVariants($q: String, $loc: ID!) {
       productVariants(first: ${SEARCH_PAGE_SIZE}, query: $q, sortKey: SKU) {
