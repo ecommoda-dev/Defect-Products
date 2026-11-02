@@ -25,7 +25,7 @@
 
 | `?action=` | طريقة | بيعمل إيه |
 |---|---|---|
-| `list_skus` | GET | بحث بالـ SKU/الاسم (الموقوف مستبعد) + الرصيد المتاح |
+| `list_skus` | GET | بحث بالـ SKU/الاسم/الباركود (الموقوف مستبعد) + الرصيد المتاح |
 | `lookup_barcode` | GET | بحث بالباركود (مطابقة تامة) |
 | `get_defect_types` | GET | قايمة أنواع العيب |
 | `add_defect_type` | POST | نوع جديد (اسم موحّد ضد التكرار — موجود = `already`) |
@@ -120,7 +120,8 @@ node docs/worker-check.mjs       # 47 اختبار سلوكي محلي (D1/R2/ش
 | shopify-graphql-helper | v2.4.0 |
 
 آخر مطابقة: 02-11-2026 · `index.js` v1.0.0
-🔴 معلّقة: الواجهة (صفحة الهب + تعديل `core.js` في الهبّين) لسه ما اتبنتش · إنشاء الـ Worker/السر/Build watch paths على كلاودفلير (أحمد) · تسجيل الأداة في `ecommoda-constants` (فهرس tool→ريبو + عضو `warehouse_ops` + اسم الـ bucket/binding + قيم اللوج) — `SKILLS-UPDATE-PACK`
+✅ الواجهة اتبنت (`Defect-Products.html` في هب المخزن v1.70.0 + `apiUpload`/`apiGetBlob` في `core.js` الهبّين) — الفحص: صفحة 107 بند · api-layer 16 بند.
+🔴 معلّقة: إنشاء الـ Worker `defect-products-worker` + `WORKER_SECRET` (= `warehouse_ops`) + `CLIENT_ID`/`CLIENT_SECRET` + Promote + Build watch paths (أحمد — في الآخر) · تسجيل الأداة في `ecommoda-constants` (فهرس tool→ريبو + عضو `warehouse_ops` رقم ١١ + الـ bucket/binding + قيم اللوج) — `SKILLS-UPDATE-PACK.md` · الاختبار الحي على SKU تجريبي بعد إنشاء الـ Worker.
 
 ## مسائل مفتوحة
 
