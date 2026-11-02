@@ -1,0 +1,56 @@
+{
+  "tool": "defect_products",
+  "since": "index.js v1.0.0",
+  "types": {
+    "login": {
+      "result": null,
+      "stage": null,
+      "desc": "دخول موظف"
+    },
+    "logout": {
+      "result": null,
+      "stage": null,
+      "desc": "خروج موظف"
+    },
+    "registered": {
+      "result": ["success", "warning", "error"],
+      "stage": "write",
+      "desc": "تسجيل ديفو + خصم 1 من المخزون (أو تسجيل بدون خصم لما الرصيد 0). error = شوبيفاي رفضت الخصم، warning = الخصم غير مؤكد أو التحديث المحلي فشل"
+    },
+    "status_changed": {
+      "result": "success",
+      "stage": "write",
+      "desc": "تحويل الحالة بين قابل للإصلاح وغير قابل للإصلاح (مالوش أثر على المخزون)"
+    },
+    "repaired": {
+      "result": ["success", "warning", "error"],
+      "stage": "write",
+      "desc": "اتصلحت — إضافة 1 للمخزون (أو من غير إضافة لو التسجيل كان بدون خصم)"
+    },
+    "cancelled": {
+      "result": ["success", "warning", "error"],
+      "stage": "write",
+      "desc": "إلغاء تسجيل — رجوع 1 للمخزون (أو من غير رجوع لو التسجيل كان بدون خصم)"
+    },
+    "image_added": {
+      "result": ["success", "warning", "error"],
+      "stage": "write",
+      "desc": "إضافة صورة لديفو (R2 ثم D1). warning = فشل مسح ملف يتيم من R2"
+    },
+    "image_deleted": {
+      "result": ["success", "warning"],
+      "stage": "write",
+      "desc": "مسح صورة من ديفو. warning = السجل اتمسح لكن ملف R2 فضل"
+    },
+    "defect_type_added": {
+      "result": "success",
+      "stage": "write",
+      "desc": "إضافة نوع عيب جديد للقايمة"
+    },
+    "rejected": {
+      "result": ["rejected", "already"],
+      "stage": ["preflight", "lookup", "write"],
+      "desc": "اتوقف قبل أي محاولة (فحص صلاحية، انتقال ممنوع، تكرار). already = الحالة المطلوبة موجودة أصلًا"
+    }
+  }
+}

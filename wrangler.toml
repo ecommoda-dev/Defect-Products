@@ -1,0 +1,44 @@
+# الشكل المعتمد لأدوات EcomModa
+# ⚠️ name لازم يطابق اسم الـ Worker في داشبورد Cloudflare حرف بحرف.
+#    لو اختلفوا، الـ build مش بيفشل — بينشر Worker جديد والأصلي بيتجمّد بصمت.
+
+name               = "defect-products-worker"
+main               = "index.js"
+compatibility_date = "2025-01-01"
+workers_dev        = true
+
+[observability]
+enabled = true
+
+# ─── D1 ──────────────────────────────────────────────
+# الـ binding دايمًا "DB" — أي اسم تاني والكتابة بتفشل بصمت
+[[d1_databases]]
+binding       = "DB"
+database_name = "ecommoda-dev-logs"
+database_id   = "90db62d3-bd7e-4d92-912b-10fc78eeb565"
+
+# ─── R2 (صور الديفوهات) ───────────────────────────────
+# الـ bucket private ومتعمل قبل الـ binding (ترتيب إلزامي — لو الـ binding اتحط
+# قبل الـ bucket، الـ build بيفشل). اسم الـ binding: IMAGES.
+[[r2_buckets]]
+binding     = "IMAGES"
+bucket_name = "defect-products-images"
+
+# ─── Vars (نص عادي — مش أسرار) ────────────────────────
+# دي بتتطبّق فعليًا مع Workers Builds. الداشبورد مش مصدر حقيقة لها.
+# ⚠️ الأداة دي بتكتب مخزون — لو LOCATION_ID ضاع هنا بترجع صفر نتايج من غير أي خطأ.
+[vars]
+SHOP_DOMAIN = "6c7e1a-53.myshopify.com"
+LOCATION_ID = "98849620290"
+
+# ⚠️ الأسرار مبتتكتبش هنا أبدًا.
+#    Worker → Settings → Variables and Secrets → علّم Secret
+#    وبعدها: Deployments → Version History → ⋯ → Promote version
+#    الأسرار المطلوبة لهذه الأداة:
+#      WORKER_SECRET   ← قيمة مجموعة `warehouse_ops` (نفس القيمة بالحرف على باقي الأعضاء)
+#      CLIENT_ID · CLIENT_SECRET   ← Shopify OAuth (نفس الـ Custom App)
+#
+# Build watch paths (Settings → Builds) — chip لكل ملف، كل واحد في سطر منفصل:
+#      index.js
+#      wrangler.toml
+#    ⛔ الاتنين في سطر واحد = chip واحد باسم مش موجود = مفيش build أبدًا وبصمت.
