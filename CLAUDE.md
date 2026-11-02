@@ -6,7 +6,7 @@
 
 **بتعمل إيه:** الموظف بيسجّل قطعة فيها عيب → بتتخصم 1 من مخزون شوبيفاي (`available`)، وبتتحط في **مخزن رقمي** (سجل بكل التفاصيل + صور اختيارية). القطعة القابلة للإصلاح لما تتصلّح بترجع للستوك +1، وغير القابلة بتفضل سجل. + تاب سجل العمليات.
 **مين بيستخدمها:** المخزن (كل موظف)
-**الإصدار:** Worker `v1.0.0`
+**الإصدار:** Worker `v1.1.0`
 
 > 🔴 **الريبو ده Worker فقط.** الواجهة صفحة جوّه هب المخزن (`Warehouse-Operations-Center`) باسم `Defect-Products.html` (قاعدة `constants` §5.2) — سابقة `Bosta-Orders-Shipped-Scanner`.
 
@@ -119,7 +119,7 @@ node docs/worker-check.mjs       # 47 اختبار سلوكي محلي (D1/R2/ش
 | ecommoda-constants | v4.4.0 |
 | shopify-graphql-helper | v2.4.0 |
 
-آخر مطابقة: 02-11-2026 · `index.js` v1.0.0
+آخر مطابقة: 02-11-2026 · `index.js` v1.1.0
 ✅ الواجهة اتبنت (`Defect-Products.html` في هب المخزن v1.70.0 + `apiUpload`/`apiGetBlob` في `core.js` الهبّين) — الفحص: صفحة 107 بند · api-layer 16 بند.
 🔴 معلّقة: إنشاء الـ Worker `defect-products-worker` + `WORKER_SECRET` (= `warehouse_ops`) + `CLIENT_ID`/`CLIENT_SECRET` + Promote + Build watch paths (أحمد — في الآخر) · تسجيل الأداة في `ecommoda-constants` (فهرس tool→ريبو + عضو `warehouse_ops` رقم ١١ + الـ bucket/binding + قيم اللوج) — `SKILLS-UPDATE-PACK.md` · الاختبار الحي على SKU تجريبي بعد إنشاء الـ Worker.
 
