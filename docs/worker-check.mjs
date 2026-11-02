@@ -161,7 +161,7 @@ test('WORKER_SECRET غايب = 500 (مش "Bearer undefined" مقبول)', async 
 });
 test('get_config بيرجّع النسخة', async () => {
   const d = await J(await call('get_config'));
-  assert.equal(d.version, '1.0.0'); assert.equal(d.tool, 'defect_products');
+  assert.equal(d.version, '1.1.0'); assert.equal(d.tool, 'defect_products');
 });
 test('diag: مصفوفة checks وكل بند ok + مفيش قيمة سر', async () => {
   const r = await call('diag'); const txt = await r.clone().text(); const d = await r.json();

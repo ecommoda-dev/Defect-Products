@@ -10,6 +10,10 @@
 // (D1) + صور اختيارية (R2). القطعة بتتصلّح فبترجع للستوك +1، أو بتتعلّم
 // غير قابلة للإصلاح فبتفضل سجل. الأداة صفحة جوّه هب المخزن.
 //
+// CHANGELOG v1.1.0 (02-11-2026) — عمود البراند + رابط الفاريانت
+//   • get_defects / get_defects_export بيرجّعوا `vendor` (البراند) لكل صف — بيتجاب من شوبيفاي وقت القراءة
+//     (مفيش عمود جديد في D1 → مفيش migration) مع كاش في الـ isolate. فشل شوبيفاي = vendor:null (مش بيوقّف القايمة).
+//   • get_defects بيرجّع `shopHandle` (من SHOP_DOMAIN) — الواجهة بتبني منه رابط صفحة الفاريانت في أدمن شوبيفاي.
 // CHANGELOG v1.0.0 (02-11-2026) — النسخة الأولى
 // ══════════════════════════════════════════════════════════════
 
@@ -17,7 +21,7 @@
 // §CONSTANTS
 // ══════════════════════════════════════════════════════════════
 const TOOL_NAME      = 'defect_products';
-const WORKER_VERSION = '1.0.0';
+const WORKER_VERSION = '1.1.0';
 
 // الأداة دي واجهة واحدة (صفحة في هب المخزن) — القايمة البيضاء لـ appId مقفولة.
 const AUTH_APPS = new Set([TOOL_NAME]);
@@ -737,6 +741,7 @@ function shapeDefect(r) {
     id:              r.id,
     requestId:       r.request_id,
     variantId:       r.variant_id,
+    productId:       r.product_id,
     sku:             r.sku,
     barcode:         r.barcode,
     productTitle:    r.product_title,
@@ -764,6 +769,27 @@ function shapeDefect(r) {
     imageCount:      r.image_count ?? 0,
   };
 }
+
+// ─── §DEFECTS::vendor — البراند من شوبيفاي وقت القراءة ───
+// كاش لكل isolate (البراند نادرًا بيتغيّر). فشل النداء = null بدون ما يوقّف القايمة.
+const vendorCache = new Map();
+async function attachVendors(env, defects) {
+  const ids = [...new Set(defects.map(d => d.productId).filter(Boolean))];
+  const missing = ids.filter(id => !vendorCache.has(id));
+  if (missing.length) {
+    try {
+      assertEnv(env, 'shopify');
+      const token = await getAccessToken(env);
+      const data = await shopifyGQL(env, token,
+        `query($ids: [ID!]!) { nodes(ids: $ids) { ... on Product { id vendor } } }`,
+        { ids: missing.map(id => `gid://shopify/Product/${id}`) }, 'defects:vendors');
+      for (const n of data?.data?.nodes || []) if (n?.id) vendorCache.set(numericId(n.id), n.vendor || '');
+    } catch (e) { console.error('attachVendors failed:', e.message); }
+  }
+  for (const d of defects) d.vendor = vendorCache.get(d.productId) || null;
+  return defects;
+}
+function shopHandleOf(env) { return String(env.SHOP_DOMAIN || '').replace(/\.myshopify\.com$/i, ''); }
 
 async function getDefectById(db, id) {
   return await db.prepare(`${DEFECT_SELECT} WHERE d.id = ?`).bind(id).first();
@@ -1658,13 +1684,15 @@ export default {
 
       // المخزن الرقمي — فلترة وترتيب وpagination من السيرفر
       if (action === 'get_defects') {
-        return json({ ok: true, defects: await getDefects(env.DB, url) }, 200, request);
+        const defects = await attachVendors(env, await getDefects(env.DB, url));
+        return json({ ok: true, defects, shopHandle: shopHandleOf(env) }, 200, request);
       }
       if (action === 'get_defects_count') {
         return json({ ok: true, total: await getDefectsCount(env.DB, url) }, 200, request);
       }
       if (action === 'get_defects_export') {
-        const [defects, total] = await Promise.all([getDefectsExport(env.DB, url), getDefectsCount(env.DB, url)]);
+        const [rows, total] = await Promise.all([getDefectsExport(env.DB, url), getDefectsCount(env.DB, url)]);
+        const defects = await attachVendors(env, rows);
         return json({ ok: true, defects, cap: DEFECT_EXPORT_MAX, total, truncated: total > DEFECT_EXPORT_MAX }, 200, request);
       }
       if (action === 'get_status_counts') {
